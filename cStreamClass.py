@@ -7,6 +7,8 @@ class circularStream:
         self.camID = camID
         self.nsec = nsec
         cam_props = {'door': {'res' : (240, 320), 'rot': 90, 'led': False}}
+
+        print('Initialising camera')
         self.cam = picamera.PiCamera()
         self.cam.resolution = cam_props[camID]['res']
         self.cam.rotation = cam_props[camID]['rot']
@@ -52,7 +54,7 @@ class circularStream:
 
                     # send images via email
                     ddt = dt.datetime.now().strftime("%H:%M:%S %y-%m-%d")
-                    print('Positive signal ' + ddt)
+                    print('Positive signal received:' + ddt)
                     child_pid = os.fork()
                     if child_pid == 0:
                         betr = 'security alert ' + self.camID + ' (' + ddt + ')'

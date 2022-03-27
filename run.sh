@@ -1,2 +1,3 @@
 #!#!/bin/sh
-python exec.py >> log &
+echo `date`
+python exec.py &> | tee log
