@@ -26,6 +26,8 @@ class circularStream:
         import time
         import datetime as dt
         import RPi.GPIO as GPIO
+        import multiprocessing as mp
+        mp.set_start_method('fork')
 
         self.cam.start_recording(self.stream, format='h264')
 
@@ -54,20 +56,33 @@ class circularStream:
 
                     # send images via email
                     ddt = dt.datetime.now().strftime("%H:%M:%S %y-%m-%d")
-                    print('Positive signal received:' + ddt)
-                    child_pid = os.fork()
-                    if child_pid == 0:
-                        betr = 'security alert ' + self.camID + ' (' + ddt + ')'
-                        msg = 'detector went off ' + ddt + ' - video recording is currently in progress, h264 will be sent shortly.'
 
-                        imgs = [self.mediaPath + 'still_'+dtime+'.jpg'] + fnameStill
-                        self.mail.notify_wImage(betr, msg, img_path=imgs)
+                    betr = 'security alert ' + self.camID + ' (' + ddt + ')'
+                    msg = 'detector went off ' + ddt + ' - video recording is currently in progress, h264 will be sent shortly.'
 
-                        time.sleep(self.nsec+10)
+                    if __name__ == '__main__':
+                        p = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, imgs))
+                        p.start()
+
+                        time.sleep(self.nsec + 10)
+
                         # send videos
                         vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
                         msg = 'detector went off ' + ddt + ' - appended are video files.'
-                        self.mail.notify_wImage(betr, msg, img_path=vids)
+                        p1 = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, vids))
+                        p1.start()
+                    #
+                    # child_pid = os.fork()
+                    #
+                    # if child_pid == 0:
+                    #     imgs = [self.mediaPath + 'still_'+dtime+'.jpg'] + fnameStill
+                    #     self.mail.notify_wImage(betr, msg, img_path=imgs)
+                    #
+                    #     time.sleep(self.nsec+10)
+                    #     # send videos
+                    #     vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
+                    #     msg = 'detector went off ' + ddt + ' - appended are video files.'
+                    #     self.mail.notify_wImage(betr, msg, img_path=vids)
 
                         # remove video files
 

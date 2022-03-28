@@ -9,6 +9,25 @@ class eNotification:
         self.PASSWORD = keys['APIKEY']
         self.RECEIVER = keys['RECEIVER']
 
+    def notify(self, subject, content):
+        import smtplib
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.text import MIMEText
+
+        msg = MIMEMultipart()
+        msg['From'] = self.USERNAME
+        msg['To'] = self.RECEIVER
+        msg['Subject'] = subject
+        msg.attach(MIMEText(content, 'plain'))
+        session = smtplib.SMTP(self.SMTP_SERVER, self.SMTP_PORT)
+        session.starttls()
+        session.login(self.USERNAME, self.PASSWORD)
+        text = msg.as_string()
+        session.sendmail(self.USERNAME, self.RECEIVER, text)
+        session.quit()
+        print('email sent')
+
+
     def notify_wImage(self, subject, content, img_path=['/home/pi/cam/still/movem.jpg']):
         import smtplib
         from email.mime.multipart import MIMEMultipart
