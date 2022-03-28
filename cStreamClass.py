@@ -56,7 +56,7 @@ class circularStream:
 
                     # send capture request to cam 2
                     print('ws cam 2')
-                    self.ws_loop.loop.run_until_complete(self.ws_main(self.mediaPath + 'cam2.h264'))
+                    self.ws_loop.run_until_complete(self.ws_main(self.mediaPath + 'cam2.h264'))
 
                     fname = dtime +'.h264'
                     self.cam.capture(self.mediaPath + 'still_'+dtime+'.jpg', format='jpeg', use_video_port=True)
