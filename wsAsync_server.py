@@ -3,9 +3,15 @@
 import asyncio
 import websockets
 import picamera
+import dotenv
 
-serverIP = '10.0.0.42'
-port = 8765
+print('Initialising websocket server (cam 2)')
+env_path = '/home/pi/camcheck/.env'
+keys = dotenv.Dotenv(env_path)
+WS_SERVER = keys['WS_SERVER']
+WS_PORT = keys['WS_PORT']
+
+
 cam = picamera.PiCamera()
 cam.resolution = (640, 480)
 cam.rotation = 180
@@ -17,7 +23,7 @@ cam.start_preview()
 #     cam.stop_recording()
 
 
-async def caputure(websocket, nsec=10):
+async def caputure(websocket, nsec=20):
     import base64
     name = await websocket.recv()
 
@@ -38,7 +44,7 @@ async def caputure(websocket, nsec=10):
         await websocket.send(vid)
         print('done')
 
-start_server = websockets.serve(caputure, serverIP, port)
+start_server = websockets.serve(caputure, WS_SERVER, WS_PORT)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
