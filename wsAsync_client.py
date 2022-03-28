@@ -8,7 +8,7 @@ class CaptureWS:
         print('Initialising websocket cam 2')
         keys = dotenv.Dotenv(env_path)
         self.WS_SERVER = keys['WS_SERVER']
-        self.WS_PORT = int(keys['WS_PORT'])
+        self.WS_PORT = keys['WS_PORT']
         self._conn = connect('ws://' + self.WS_SERVER + ':' + self.WS_PORT, max_size=3000000)
         self.websocket = await self._conn.__aenter__()
         return self
