@@ -54,10 +54,6 @@ class circularStream:
                     dtime = dt.datetime.now().strftime("%H:%M:%S_%y-%m-%d")
                     print('signal received ' + dtime)
 
-                    # send capture request to cam 2
-                    print('ws cam 2')
-                    self.ws_loop.run_until_complete(self.ws_main(self.mediaPath + 'cam2.h264'))
-
                     fname = dtime +'.h264'
                     self.cam.capture(self.mediaPath + 'still_'+dtime+'.jpg', format='jpeg', use_video_port=True)
                     self.cam.split_recording(self.mediaPath + 'after_'+fname)
@@ -80,7 +76,9 @@ class circularStream:
                     p.start()
                     t2 = time.time()
 
-                    time.sleep(self.nsec + 5)
+                    # send capture request to cam 2
+                    print('request video via ws cam 2')
+                    self.ws_loop.run_until_complete(self.ws_main(self.mediaPath + 'cam2.h264'))
 
                     print('emailing videos')
                     # send videos
