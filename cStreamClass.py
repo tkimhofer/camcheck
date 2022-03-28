@@ -37,6 +37,7 @@ class circularStream:
         GPIO.setup(pinID, GPIO.IN)
         print(f'pin value at init {GPIO.input(pinID)}')
 
+        print('\n\n')
         try:
             while True:
                 #self.cam.wait_recording(1)
@@ -53,7 +54,7 @@ class circularStream:
                     self.stream.clear()
 
                     # capture photo and send email in new process
-                    print('capturing sequence ' + dtime)
+                    print('capturing image sequence ')
                     fnameStill = [
                         f'{self.mediaPath}image%02d_{dtime}.jpg' % i
                         for i in range(1, nImages + 1)
@@ -63,13 +64,13 @@ class circularStream:
                     betr = 'security alert ' + self.camID + ' (' + dtime + ')'
                     msg = 'detector went off ' + dtime + ' - video recording is currently in progress, h264 will be sent shortly.'
 
-                    print('sending email photos')
+                    print('emailing sequence')
                     p = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, fnameStill))
                     p.start()
                     t2 = time.time()
 
-                    time.sleep(self.nsec + 10)
-                    print('sending email videos')
+                    time.sleep(self.nsec + 5)
+                    print('emailing videos')
                     # send videos
                     vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
                     msg = 'detector went off ' + dtime + ' - appended are video files.'
@@ -94,10 +95,13 @@ class circularStream:
                     while GPIO.input(pinID) == 1:
                         self.cam.wait_recording(2)
                     t5 = time.time()
-                    print(f'time idle due to continuing signal: {t4-t5}')
+                    print('---')
+                    print(f'time full cycle (vigil to vigil): {round(t3 - t1)}')
                     print(f'time from signal received to emailing photos: {round(t2 - t1)}')
                     print(f'time from signal received to emailing videos: {round(t3 - t1)}')
-                    print(f'full cycle: vigil to vigil: {round(t3 - t1)}')
+                    print(f'time idle due to continuing signal: {t5-t4}')
+
+                    print('\n\n')
 
         finally:
             self.cam.stop_recording()
