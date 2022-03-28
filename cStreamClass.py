@@ -3,7 +3,10 @@ class circularStream:
     def __init__(self, camID='door', nsec=15, mediaPath='/home/pi/cam/mess/media/'):
         import picamera
         import notiClass as noti
+        import wsAsync_client as ws
+        import asyncio
         import os
+
         self.camID = camID
         self.nsec = nsec
         cam_props = {'door': {'res' : (240, 320), 'rot': 90, 'led': False}}
@@ -15,17 +18,22 @@ class circularStream:
         self.cam.led = cam_props[camID]['led']
         self.stream = picamera.PiCameraCircularIO(self.cam, seconds=nsec)
 
-        self.mail = noti.eNotification()
-
         if not mediaPath.endswith(os.path.sep):
             mediaPath += os.path.sep
         self.mediaPath = mediaPath
+
+        self.mail = noti.eNotification()
+        self.ws_loop = asyncio.get_event_loop()
+        self.ws_main = ws.main
+
+
 
     def run(self, pinID=24, nImages=15):
         import time
         import datetime as dt
         import RPi.GPIO as GPIO
         import multiprocessing as mp
+        import asyncio
         mp.set_start_method('fork')
 
         print('start circular stream')
@@ -40,12 +48,15 @@ class circularStream:
         print('\n\n')
         try:
             while True:
-                #self.cam.wait_recording(1)
                 signal = GPIO.input(pinID)
                 if signal == 1:
                     t1 = time.time()
                     dtime = dt.datetime.now().strftime("%H:%M:%S_%y-%m-%d")
                     print('signal received ' + dtime)
+
+                    # send capture request to cam 2
+                    print('ws cam 2')
+                    self.ws_loop.loop.run_until_complete(self.ws_main(self.mediaPath + 'cam2.h264'))
 
                     fname = dtime +'.h264'
                     self.cam.capture(self.mediaPath + 'still_'+dtime+'.jpg', format='jpeg', use_video_port=True)
@@ -70,27 +81,16 @@ class circularStream:
                     t2 = time.time()
 
                     time.sleep(self.nsec + 5)
+
                     print('emailing videos')
                     # send videos
-                    vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
+                    vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname, self.mediaPath + 'cam2.h264']
                     msg = 'detector went off ' + dtime + ' - appended are video files.'
                     p1 = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, vids))
                     p1.start()
                     t3 = time.time()
-                    #
-                    # child_pid = os.fork()
-                    #
-                    # if child_pid == 0:
-                    #     imgs = [self.mediaPath + 'still_'+dtime+'.jpg'] + fnameStill
-                    #     self.mail.notify_wImage(betr, msg, img_path=imgs)
-                    #
-                    #     time.sleep(self.nsec+10)
-                    #     # send videos
-                    #     vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
-                    #     msg = 'detector went off ' + ddt + ' - appended are video files.'
-                    #     self.mail.notify_wImage(betr, msg, img_path=vids)
 
-                        # remove video files
+                    # remove video files
                     t4 = time.time()
                     while GPIO.input(pinID) == 1:
                         self.cam.wait_recording(2)
