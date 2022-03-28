@@ -64,7 +64,7 @@ class circularStream:
                     msg = 'detector went off ' + dtime + ' - video recording is currently in progress, h264 will be sent shortly.'
 
                     print('sending email photos')
-                    p = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, imgs))
+                    p = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, fnameStill))
                     p.start()
                     t2 = time.time()
 
