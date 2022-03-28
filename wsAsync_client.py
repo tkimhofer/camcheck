@@ -1,7 +1,7 @@
 import asyncio
 # define client websocket
 class CaptureWS:
-    async def __aenter__(self, env_path = "/home/pi/cam/mess/.env"):
+    async def __aenter__(self, env_path = "/home/pi/camcheck/.env"):
         from websockets import connect
         import dotenv
 
