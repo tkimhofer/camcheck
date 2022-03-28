@@ -35,7 +35,7 @@ class circularStream:
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pinID, GPIO.IN)
-        print('pin value at init '+ GPIO.input(pinID) )
+        print(f'pin value at init {GPIO.input(pinID)}')
 
         try:
             while True:
