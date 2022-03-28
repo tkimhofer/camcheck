@@ -24,9 +24,8 @@ class circularStream:
 
         self.mail = noti.eNotification()
         self.ws_loop = asyncio.get_event_loop()
-        self.ws_main = ws.main
-
-
+        self.ws_main_cap = ws.main_cap
+        self.ws_main_ret = ws.main_ret
 
     def run(self, pinID=24, nImages=15):
         import time
@@ -68,6 +67,10 @@ class circularStream:
                     ]
                     self.cam.capture_sequence(fnameStill)
 
+                    # send capture request to cam 2
+                    print('request to record video via ws cam 2')
+                    self.ws_loop.run_until_complete(self.ws_main_cap())
+
                     betr = 'security alert ' + self.camID + ' (' + dtime + ')'
                     msg = 'detector went off ' + dtime + ' - video recording is currently in progress, h264 will be sent shortly.'
 
@@ -78,7 +81,7 @@ class circularStream:
 
                     # send capture request to cam 2
                     print('request video via ws cam 2')
-                    self.ws_loop.run_until_complete(self.ws_main(self.mediaPath + 'cam2.h264'))
+                    self.ws_loop.run_until_complete(self.ws_main_ret(self.mediaPath + 'cam2.h264'))
 
                     print('emailing videos')
                     # send videos

@@ -7,7 +7,15 @@ import picamera
 serverIP = '10.0.0.42'
 port = 8765
 cam = picamera.PiCamera()
+cam.resolution = (640, 480)
 cam.rotation = 180
+cam.start_preview()
+
+# def record(cam, nsec=10):
+#     cam.start_recording('my_video.h264')
+#     cam.wait_recording(nsec)
+#     cam.stop_recording()
+
 
 async def caputure(websocket, nsec=10):
     import base64
@@ -15,15 +23,18 @@ async def caputure(websocket, nsec=10):
 
     if name == 'capture':
         print('start capturing')
+        await websocket.send('ok')
+
         # start camera and capture
-        cam.resolution = (640, 480)
         cam.start_recording('my_video.h264')
         cam.wait_recording(nsec)
         cam.stop_recording()
-        print('encoding')
+        print('recording done')
+
+    if name == 'retrieve':
+        print('encoding and sending')
         # send capture file as binary
         vid = base64.b64encode(open("my_video.h264", "rb").read())
-        print('sending')
         await websocket.send(vid)
         print('done')
 

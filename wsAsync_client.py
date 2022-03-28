@@ -14,7 +14,8 @@ class CaptureWS:
         return self
     async def __aexit__(self, *args, **kwargs):
         await self._conn.__aexit__(*args, **kwargs)
-    async def send(self, message='capture'):
+    async def send(self, message):
+        # implemented are message='capture' and message='retrieve'
         await self.websocket.send(message)
     async def receive(self, fpath):
         import base64
@@ -25,7 +26,11 @@ class CaptureWS:
         fh.close()
         print("cam2 video recorded (ws)")
 
-async def main(fpath):
+async def main_cap():
     async with CaptureWS() as cap:
-        await cap.send()
+        await cap.send(message='capture')
+
+async def main_ret(fpath):
+    async with CaptureWS() as cap:
+        await cap.send(message='retrieve')
         await cap.receive(fpath)
