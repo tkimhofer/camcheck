@@ -63,20 +63,19 @@ class circularStream:
                     betr = 'security alert ' + self.camID + ' (' + dtime + ')'
                     msg = 'detector went off ' + dtime + ' - video recording is currently in progress, h264 will be sent shortly.'
 
-                    if __name__ == '__main__':
-                        print('sending email photos')
-                        p = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, imgs))
-                        p.start()
-                        t2 = time.time()
+                    print('sending email photos')
+                    p = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, imgs))
+                    p.start()
+                    t2 = time.time()
 
-                        time.sleep(self.nsec + 10)
-                        print('sending email videos')
-                        # send videos
-                        vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
-                        msg = 'detector went off ' + ddt + ' - appended are video files.'
-                        p1 = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, vids))
-                        p1.start()
-                        t3 = time.time()
+                    time.sleep(self.nsec + 10)
+                    print('sending email videos')
+                    # send videos
+                    vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
+                    msg = 'detector went off ' + ddt + ' - appended are video files.'
+                    p1 = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, vids))
+                    p1.start()
+                    t3 = time.time()
                     #
                     # child_pid = os.fork()
                     #
@@ -92,8 +91,7 @@ class circularStream:
 
                         # remove video files
                     t4 = time.time()
-                    while signal == 1:
-                        print('')
+                    while GPIO.input(pinID) == 1:
                         self.cam.wait_recording(2)
                     t5 = time.time()
                     print(f'time idle due to continuing signal: {t4-t5}')
