@@ -72,7 +72,7 @@ class circularStream:
                     print('sending email videos')
                     # send videos
                     vids = [self.mediaPath + 'after_' + fname, self.mediaPath + 'before_' + fname]
-                    msg = 'detector went off ' + ddt + ' - appended are video files.'
+                    msg = 'detector went off ' + dtime + ' - appended are video files.'
                     p1 = mp.Process(group=None, target=self.mail.notify_wImage, args=(betr, msg, vids))
                     p1.start()
                     t3 = time.time()
