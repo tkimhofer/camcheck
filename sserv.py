@@ -1,4 +1,10 @@
 import asyncio
+import dotenv
+env_path = '/home/pi/camcheck/.env'
+keys = dotenv.Dotenv(env_path)
+WS_SERVER = keys['WS_SERVER']
+WS_PORT = keys['WS_PORT']
+
 
 async def handle_echo(reader, writer):
     data = await reader.read(100)
@@ -16,7 +22,7 @@ async def handle_echo(reader, writer):
 
 async def main():
     server = await asyncio.start_server(
-        handle_echo, '127.0.0.1', 8888)
+        handle_echo, WS_SERVER, WS_PORT)
 
     addrs = ', '.join(str(sock.getsockname()) for sock in server.sockets)
     print(f'Serving on {addrs}')
