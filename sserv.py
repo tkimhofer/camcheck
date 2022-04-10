@@ -25,6 +25,7 @@ async def handle_echo(reader, writer):
         sio = io.BytesIO()  # for Python3
         while 1 > 0:
             cam.capture(sio, "jpeg", use_video_port=True)
+            print(base64.b64encode(sio.getvalue()))
             writer.write(base64.b64encode(sio.getvalue()))
         #await writer.drain()
     else:
