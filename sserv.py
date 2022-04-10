@@ -23,8 +23,9 @@ async def handle_echo(reader, writer):
     print(f"Received {message!r} from {addr!r}")
     if message == 'send_stream':
         sio = io.BytesIO()  # for Python3
-        cam.capture(sio, "jpeg", use_video_port=True)
-        writer.write(base64.b64encode(sio.getvalue()))
+        while 1 > 0:
+            cam.capture(sio, "jpeg", use_video_port=True)
+            writer.write(base64.b64encode(sio.getvalue()))
         #await writer.drain()
     else:
         print(f"Send: {message!r}")
