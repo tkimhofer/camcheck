@@ -27,7 +27,7 @@ async def periodic(reader, writer):
             sio = io.BytesIO()  # for Python3
             cam.capture(sio, "jpeg", use_video_port=True)
             writer.write(base64.b64encode(sio.getvalue()))
-            asyncio.sleep(0.001)
+            await asyncio.sleep(0.001)
     writer.close()
 
 #
