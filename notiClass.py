@@ -2,7 +2,7 @@ class eNotification:
     def __init__(self, env_path = "/home/pi/cam/mess/.env"):
         print('Initialising email notifications')
         import dotenv
-        keys = dotenv.Dotenv(env_path)
+        keys = dotenv.dotenv_values(env_path)
         self.SMTP_SERVER = keys['SERVER']
         self.SMTP_PORT = int(keys['PORT'])
         self.USERNAME = keys['ADDRESS']
